@@ -78,7 +78,6 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
 
   daemon_t daemon;
   err = daemon_spawn(&daemon, (const char *) file, (const char **) args, (const char **) pairs);
-  assert(err == 0);
 
   for (uint32_t i = 0; i < args_len; i++) {
     free(args[i + 1]);
@@ -90,6 +89,13 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
 
   free(args);
   free(pairs);
+
+  if (err < 0) {
+    err = js_throw_error(env, NULL, "spawn() failed");
+    assert(err == 0);
+
+    return NULL;
+  }
 
   js_value_t *result;
   err = js_create_int64(env, daemon.pid, &result);

@@ -10,3 +10,7 @@ test('spawn', (t) => {
   t.comment(daemon)
   t.ok(daemon)
 })
+
+test('spawn, file missing', async (t) => {
+  await t.exception(() => spawn('./this-does-not-exist'))
+})
