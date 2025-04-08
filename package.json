@@ -1,0 +1,41 @@
+{
+  "name": "bare-daemon",
+  "version": "1.0.0",
+  "description": "Create and manage daemon processes in Bare",
+  "exports": {
+    "./package": "./package.json",
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "binding.c",
+    "binding.js",
+    "CMakeLists.txt",
+    "prebuilds"
+  ],
+  "addon": true,
+  "scripts": {
+    "test": "prettier . --check && bare test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/bare-daemon.git"
+  },
+  "author": "Holepunch",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/holepunchto/bare-daemon/issues"
+  },
+  "homepage": "https://github.com/holepunchto/bare-daemon#readme",
+  "dependencies": {
+    "bare-env": "^3.0.0"
+  },
+  "devDependencies": {
+    "bare-os": "^3.6.1",
+    "brittle": "^3.4.0",
+    "cmake-bare": "^1.1.2",
+    "cmake-fetch": "^1.4.1",
+    "prettier": "^3.3.3",
+    "prettier-config-standard": "^7.0.0"
+  }
+}
