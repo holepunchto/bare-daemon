@@ -5,7 +5,7 @@ find_package(cmake-fetch REQUIRED PATHS node_modules/cmake-fetch)
 
 project(bare_daemon C)
 
-fetch_package("github:holepunchto/libdaemon#ed75838")
+fetch_package("github:holepunchto/libdaemon#82c08de")
 
 add_bare_module(bare_daemon)
 
