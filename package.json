@@ -1,6 +1,6 @@
 {
   "name": "bare-daemon",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Create and manage daemon processes in Bare",
   "exports": {
     "./package": "./package.json",
