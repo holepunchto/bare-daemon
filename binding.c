@@ -10,13 +10,13 @@ static js_value_t *
 bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
   int err;
 
-  size_t argc = 3;
-  js_value_t *argv[3];
+  size_t argc = 4;
+  js_value_t *argv[4];
 
   err = js_get_callback_info(env, info, &argc, argv, NULL, NULL);
   assert(err == 0);
 
-  assert(argc == 3);
+  assert(argc == 4);
 
   uv_loop_t *loop;
   err = js_get_env_loop(env, &loop);
@@ -76,8 +76,12 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
     pairs[i] = pair;
   }
 
+  bare_daemon_path_t cwd;
+  err = js_get_value_string_utf8(env, argv[3], cwd, sizeof(bare_daemon_path_t), NULL);
+  assert(err == 0);
+
   daemon_t daemon;
-  err = daemon_spawn(&daemon, (const char *) file, (const char **) args, (const char **) pairs);
+  err = daemon_spawn(&daemon, (const char *) file, (const char **) args, (const char **) pairs, (const char *) cwd);
 
   for (uint32_t i = 0; i < args_len; i++) {
     free(args[i + 1]);

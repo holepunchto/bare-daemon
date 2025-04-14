@@ -1,5 +1,6 @@
 const test = require('brittle')
 const os = require('bare-os')
+const path = require('bare-path')
 const { spawn } = require('.')
 
 test('spawn', (t) => {
@@ -13,4 +14,16 @@ test('spawn', (t) => {
 
 test('spawn, file missing', async (t) => {
   await t.exception(() => spawn('./this-does-not-exist'))
+})
+
+test('spawn, cwd', async (t) => {
+  const daemon = spawn(
+    os.execPath(),
+    [require.resolve('./test/fixtures/cwd.js')],
+    {
+      cwd: path.resolve(__dirname, 'test/fixtures')
+    }
+  )
+
+  t.ok(daemon)
 })
