@@ -1,6 +1,6 @@
 # bare-daemon
 
-Create and manage daemon processes in Bare.
+Create and manage daemon processes in JavaScript.
 
 ```
 npm i bare-daemon

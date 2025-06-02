@@ -1,6 +1,5 @@
-const os = require('bare-os')
-const env = require('bare-env')
-const binding = require('./binding')
+const process = require('process')
+const binding = require('#binding')
 
 exports.Daemon = class Daemon {
   constructor(pid) {
@@ -22,11 +21,11 @@ exports.spawn = function spawn(file, args, opts) {
 
   args = args.map(String)
 
-  const { cwd = os.cwd() } = opts
+  const { cwd = process.cwd(), env = process.env } = opts
 
   const pairs = []
 
-  for (const [key, value] of Object.entries(opts.env || env)) {
+  for (const [key, value] of Object.entries(env)) {
     pairs.push(`${key}=${value}`)
   }
 
