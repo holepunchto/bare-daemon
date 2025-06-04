@@ -33,6 +33,12 @@ target_sources(
     binding.c
 )
 
+target_compile_definitions(
+  ${bare_daemon_napi}
+  PRIVATE
+    NAPI_VERSION=9
+)
+
 target_link_libraries(
   ${bare_daemon_napi}
   PRIVATE
