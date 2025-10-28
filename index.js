@@ -1,4 +1,4 @@
-const process = require('process')
+const runtime = require('#runtime')
 const binding = require('#binding')
 
 exports.Daemon = class Daemon {
@@ -21,7 +21,7 @@ exports.spawn = function spawn(file, args, opts) {
 
   args = args.map(String)
 
-  const { cwd = process.cwd(), env = process.env } = opts
+  const { cwd = runtime.cwd(), env = runtime.env } = opts
 
   const pairs = []
 
