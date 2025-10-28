@@ -1,6 +1,6 @@
 {
   "name": "bare-daemon",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Create and manage daemon processes in JavaScript",
   "exports": {
     "./package": "./package.json",
