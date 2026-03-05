@@ -64,6 +64,6 @@
     "cmake-napi": "^1.2.2",
     "cmake-npm": "^1.1.0",
     "prettier": "^3.3.3",
-    "prettier-config-standard": "^7.0.0"
+    "prettier-config-holepunch": "^2.0.0"
   }
 }
