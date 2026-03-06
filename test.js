@@ -4,9 +4,7 @@ const path = require('path')
 const { spawn } = require('.')
 
 test('spawn', (t) => {
-  const daemon = spawn(process.execPath, [
-    require.resolve('./test/fixtures/sleep.js')
-  ])
+  const daemon = spawn(process.execPath, [require.resolve('./test/fixtures/sleep.js')])
 
   t.comment(daemon)
   t.ok(daemon)
@@ -17,13 +15,9 @@ test('spawn, file missing', async (t) => {
 })
 
 test('spawn, cwd', async (t) => {
-  const daemon = spawn(
-    process.execPath,
-    [require.resolve('./test/fixtures/cwd.js')],
-    {
-      cwd: path.resolve(__dirname, 'test/fixtures')
-    }
-  )
+  const daemon = spawn(process.execPath, [require.resolve('./test/fixtures/cwd.js')], {
+    cwd: path.resolve(__dirname, 'test/fixtures')
+  })
 
   t.ok(daemon)
 })
