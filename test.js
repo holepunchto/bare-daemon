@@ -14,7 +14,7 @@ test('spawn, file missing', async (t) => {
   await t.exception(() => spawn('./this-does-not-exist'))
 })
 
-test('spawn, cwd', async (t) => {
+test('spawn, cwd', (t) => {
   const daemon = spawn(process.execPath, [require.resolve('./test/fixtures/cwd.js')], {
     cwd: path.resolve(__dirname, 'test/fixtures')
   })
