@@ -1,5 +1,8 @@
-const os = require('bare-os')
-const fs = require('bare-fs')
-const path = require('bare-path')
+const fs = require('fs')
+const path = require('path')
+const process = require('process')
 
-fs.writeFileSync(path.join(__dirname, 'cwd.txt'), os.cwd())
+const output = process.argv[2] || path.join(__dirname, 'cwd.txt')
+
+fs.writeFileSync(output + '.tmp', process.cwd())
+fs.renameSync(output + '.tmp', output)
