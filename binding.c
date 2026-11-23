@@ -3,12 +3,13 @@
 #include <daemon.h>
 #include <js.h>
 #include <stdlib.h>
+#include <string.h>
 #include <utf.h>
 
 typedef utf8_t bare_daemon_string_buffer_t[256];
 
 static utf8_t *
-bare_daemon__get_string(js_env_t *env, js_value_t *value, bare_daemon_string_buffer_t buffer) {
+bare_daemon__get_string(js_env_t *env, js_value_t *value, bare_daemon_string_buffer_t buffer, bool *valid) {
   int err;
 
   size_t str_len;
@@ -27,6 +28,8 @@ bare_daemon__get_string(js_env_t *env, js_value_t *value, bare_daemon_string_buf
 
   err = js_get_value_string_utf8(env, value, result, len, NULL);
   assert(err == 0);
+
+  if (strlen((char *) result) != str_len) *valid = false;
 
   return result;
 }
@@ -52,8 +55,10 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
   err = js_get_env_loop(env, &loop);
   assert(err == 0);
 
+  bool valid = true;
+
   bare_daemon_string_buffer_t file_buffer;
-  utf8_t *file = bare_daemon__get_string(env, argv[0], file_buffer);
+  utf8_t *file = bare_daemon__get_string(env, argv[0], file_buffer, &valid);
 
   uint32_t args_len;
   err = js_get_array_length(env, argv[1], &args_len);
@@ -77,6 +82,8 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
     utf8_t *arg = malloc(arg_len);
     err = js_get_value_string_utf8(env, value, arg, arg_len, NULL);
     assert(err == 0);
+
+    if (strlen((char *) arg) != arg_len - 1 /* NULL */) valid = false;
 
     args[i + 1] = arg;
   }
@@ -102,14 +109,19 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
     err = js_get_value_string_utf8(env, value, pair, pair_len, NULL);
     assert(err == 0);
 
+    if (strlen((char *) pair) != pair_len - 1 /* NULL */) valid = false;
+
     pairs[i] = pair;
   }
 
   bare_daemon_string_buffer_t cwd_buffer;
-  utf8_t *cwd = bare_daemon__get_string(env, argv[3], cwd_buffer);
+  utf8_t *cwd = bare_daemon__get_string(env, argv[3], cwd_buffer, &valid);
 
   daemon_t daemon;
-  err = daemon_spawn(&daemon, (const char *) file, (const char **) args, (const char **) pairs, (const char *) cwd);
+
+  if (valid) {
+    err = daemon_spawn(&daemon, (const char *) file, (const char **) args, (const char **) pairs, (const char *) cwd);
+  }
 
   for (uint32_t i = 0; i < args_len; i++) {
     free(args[i + 1]);
@@ -124,6 +136,13 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
 
   bare_daemon__free_string(file, file_buffer);
   bare_daemon__free_string(cwd, cwd_buffer);
+
+  if (!valid) {
+    err = js_throw_type_error(env, NULL, "Arguments must not contain null bytes");
+    assert(err == 0);
+
+    return NULL;
+  }
 
   if (err < 0) {
     err = js_throw_error(env, NULL, "spawn() failed");
