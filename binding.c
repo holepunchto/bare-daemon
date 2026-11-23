@@ -2,9 +2,39 @@
 #include <bare.h>
 #include <daemon.h>
 #include <js.h>
+#include <stdlib.h>
 #include <utf.h>
 
-typedef utf8_t bare_daemon_path_t[4096 + 1 /* NULL */];
+typedef utf8_t bare_daemon_string_buffer_t[256];
+
+static utf8_t *
+bare_daemon__get_string(js_env_t *env, js_value_t *value, bare_daemon_string_buffer_t buffer) {
+  int err;
+
+  size_t str_len;
+  err = js_get_value_string_utf8(env, value, NULL, 0, &str_len);
+  assert(err == 0);
+
+  utf8_t *result = buffer;
+
+  size_t len = sizeof(bare_daemon_string_buffer_t);
+
+  if (str_len + 1 /* NULL */ > len) {
+    len = str_len + 1 /* NULL */;
+
+    result = malloc(len);
+  }
+
+  err = js_get_value_string_utf8(env, value, result, len, NULL);
+  assert(err == 0);
+
+  return result;
+}
+
+static void
+bare_daemon__free_string(utf8_t *string, utf8_t *buffer) {
+  if (string != buffer) free(string);
+}
 
 static js_value_t *
 bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
@@ -22,9 +52,8 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
   err = js_get_env_loop(env, &loop);
   assert(err == 0);
 
-  bare_daemon_path_t file;
-  err = js_get_value_string_utf8(env, argv[0], file, sizeof(bare_daemon_path_t), NULL);
-  assert(err == 0);
+  bare_daemon_string_buffer_t file_buffer;
+  utf8_t *file = bare_daemon__get_string(env, argv[0], file_buffer);
 
   uint32_t args_len;
   err = js_get_array_length(env, argv[1], &args_len);
@@ -76,9 +105,8 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
     pairs[i] = pair;
   }
 
-  bare_daemon_path_t cwd;
-  err = js_get_value_string_utf8(env, argv[3], cwd, sizeof(bare_daemon_path_t), NULL);
-  assert(err == 0);
+  bare_daemon_string_buffer_t cwd_buffer;
+  utf8_t *cwd = bare_daemon__get_string(env, argv[3], cwd_buffer);
 
   daemon_t daemon;
   err = daemon_spawn(&daemon, (const char *) file, (const char **) args, (const char **) pairs, (const char *) cwd);
@@ -93,6 +121,9 @@ bare_daemon_spawn(js_env_t *env, js_callback_info_t *info) {
 
   free(args);
   free(pairs);
+
+  bare_daemon__free_string(file, file_buffer);
+  bare_daemon__free_string(cwd, cwd_buffer);
 
   if (err < 0) {
     err = js_throw_error(env, NULL, "spawn() failed");

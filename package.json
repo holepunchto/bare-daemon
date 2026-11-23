@@ -15,6 +15,10 @@
       "bare": "./lib/runtime/bare.js",
       "node": "./lib/runtime/node.js"
     },
+    "fs": {
+      "bare": "bare-fs",
+      "default": "fs"
+    },
     "path": {
       "bare": "bare-path",
       "default": "path"
