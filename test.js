@@ -15,6 +15,22 @@ test('spawn, file missing', async (t) => {
   await t.exception(() => spawn('./this-does-not-exist'))
 })
 
+test('spawn, arguments with a NUL', (t) => {
+  const fixture = require.resolve('./test/fixtures/sleep.js')
+
+  const cases = [
+    [process.execPath + '\0x', [fixture], {}],
+    [process.execPath, [fixture + '\0.png'], {}],
+    [process.execPath, [fixture], { cwd: '.\0/missing' }],
+    [process.execPath, [fixture], { env: { 'A\0B': '1' } }],
+    [process.execPath, [fixture], { env: { A: '1\0' } }]
+  ]
+
+  for (const [file, args, opts] of cases) {
+    t.exception.all(() => spawn(file, args, opts), TypeError)
+  }
+})
+
 test('spawn, cwd', (t) => {
   const daemon = spawn(process.execPath, [require.resolve('./test/fixtures/cwd.js')], {
     cwd: path.resolve(__dirname, 'test/fixtures')
