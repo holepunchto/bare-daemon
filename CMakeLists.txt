@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 4.0)
 
 find_package(cmake-bare REQUIRED PATHS node_modules/cmake-bare)
 find_package(cmake-fetch REQUIRED PATHS node_modules/cmake-fetch)
 find_package(cmake-napi REQUIRED PATHS node_modules/cmake-napi)
-find_package(cmake-npm REQUIRED PATHS node_modules/cmake-npm)
 
 project(bare_daemon C)
 
+fetch_package("github:holepunchto/libnapish#8cbfe78")
 fetch_package("github:holepunchto/libdaemon#09f985d")
 
 add_bare_module(bare_daemon)
@@ -33,24 +33,11 @@ target_sources(
     binding.c
 )
 
-target_compile_definitions(
-  ${bare_daemon_napi}
-  PRIVATE
-    NAPI_VERSION=9
-)
-
 target_link_libraries(
   ${bare_daemon_napi}
   PRIVATE
     $<TARGET_OBJECTS:daemon>
+    napish::static
   PUBLIC
     daemon
-)
-
-resolve_node_module(bare-compat-napi compat)
-
-target_include_directories(
-  ${bare_daemon_napi}
-  PRIVATE
-    "${compat}/include"
 )
